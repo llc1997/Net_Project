@@ -7,25 +7,16 @@
 返回值: 无
 *******************************************************************/
 int main_child(){
+	printf("main_child初始化Ip链表\n");
 	//初始化 配置文件
 // **********文件：ip_link************************
 	init_ip_link();
 	
 	//获取接口信息
 	//getinterface()填充了数组：net_interface[MAXINTERFACES];接口数据结构体数组
-	/*结构体原型
-		typedef struct interface{
-		char name[20];		//接口名字
-		unsigned char ip[4];		//IP地址
-		unsigned char mac[6];		//MAC地址
-		unsigned char netmask[4];	//子网掩码
-		unsigned char br_ip[4];		//广播地址
-		int  flag;			//状态
-		}INTERFACE;
-	*/
 // **********文件：get_interface************************
 	getinterface();
-	
+	printf("getinterface初始化接口数据\n");
 	//创建键盘处理函数并脱离
 	pthread_t KEY_T;
 // **********文件：key_pthread************************
@@ -38,12 +29,12 @@ int main_child(){
 		perror("socket");
 		_exit(-1);
 	}
-	char recv_buff[RECV_SIZE]="";//原始套接字数据包大约为1500个字节
+	char recv_buff[MY_RECV_SIZE_T]="";//原始套接字数据包大约为1500个字节
 	ssize_t recv_len=0;
 	while(1){
 		bzero(recv_buff,sizeof(recv_buff));
 		recv_len = recvfrom(raw_sock_fd, recv_buff, sizeof(recv_buff), 0, NULL, NULL);
-		if(recv_len<=0||recv_len>RECV_SIZE){
+		if(recv_len<=0||recv_len>MY_RECV_SIZE_T){
 			perror("recvfrom");
 			continue;
 		}
@@ -53,8 +44,8 @@ int main_child(){
 				perror("malloc");
 				continue;
 			}
-			memcpy(p->mac, recv_buff+22, 6);//mac，填充amc
-			memcpy(p->ip , recv_buff+28, 4);//ip ，填充ip
+			memcpy(p->arp_mac, recv_buff+22, 6);//mac，填充amc
+			memcpy(p->arp_ip , recv_buff+28, 4);//ip ，填充ip
 			//printf("%d.%d.%d.%d-->",p->ip[0],p->ip[1],p->ip[2],p->ip[3]);
 			pthread_t ARP_T;
 // **********文件：arp_pthread************************

@@ -34,6 +34,11 @@ void getinterface(){
 	struct ifconf ifc;                  /* ifconf结构 */
 	
 	int sock_raw_fd = socket(PF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
+    if(sock_raw_fd < 0)
+    {
+        perror("fail to socket");
+        return ;
+    }
 	 /* 初始化ifconf结构 */
     ifc.ifc_len = sizeof(buf);
     ifc.ifc_buf = (caddr_t) buf;
